@@ -1,20 +1,33 @@
 import React, { Component } from 'react';
-import { Button } from 'react-bootstrap';
+
+import { Form, FormGroup, ControlLabel, FormControl, Button } from 'react-bootstrap';
+
 import './App.css';
 
 class App extends Component {
+  onFormSubmit = (evt) => {
+    evt.preventDefault();
+    console.log(this.name.value);
+  }
   render() {
-    const wellStyles = {maxWidth: 400, margin: '0 auto 10px'};
+    
     return (
-      <div className="well" style={wellStyles}>
-        <Button 
-          bsStyle="primary" 
-          bsSize="large" 
-          block
-        >
-        Button
+      <Form inline onSubmit={this.onFormSubmit}>
+        <h3>Sign Up</h3>
+        <FormGroup controlId="formInlineName">
+          <ControlLabel>Name</ControlLabel>
+          {' '}
+          <FormControl
+            type="text"
+            placeholder="Name"
+            inputRef={(input) => this.name = input}
+          />
+        </FormGroup>
+        {' '}
+        <Button type="submit">
+        Submit
         </Button>
-      </div>
+      </Form>
     );
   }
 }
