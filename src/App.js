@@ -5,29 +5,48 @@ import { Form, FormGroup, ControlLabel, FormControl, Button } from 'react-bootst
 import './App.css';
 
 class App extends Component {
+  state = { name: '',
+            names: [],
+  };
+
   onFormSubmit = (evt) => {
+    const names = [...this.state.names, this.state.name];
+    this.setState({ names: names, name: '' });
     evt.preventDefault();
-    console.log(this.name.value);
+  }
+  onNameChange = (evt) => {
+    this.setState({ name: evt.target.value });
   }
   render() {
-    
+    const wellStyles = {maxWidth: 400, margin: '20px auto 10px'};
+
     return (
-      <Form inline onSubmit={this.onFormSubmit}>
-        <h3>Sign Up</h3>
-        <FormGroup controlId="formInlineName">
-          <ControlLabel>Name</ControlLabel>
+      <div className="well" style={wellStyles}>
+        <Form inline onSubmit={this.onFormSubmit}>
+          <h3>Sign Up</h3>
+          <FormGroup controlId="formInlineName">
+            <ControlLabel>Name</ControlLabel>
+            {' '}
+            <FormControl
+              type="text"
+              placeholder="Name"
+              value={this.state.name}
+              onChange={this.onNameChange}
+            />
+          </FormGroup>
           {' '}
-          <FormControl
-            type="text"
-            placeholder="Name"
-            inputRef={(input) => this.name = input}
-          />
-        </FormGroup>
-        {' '}
-        <Button type="submit">
-        Submit
-        </Button>
-      </Form>
+          <Button type="submit">
+          Submit
+          </Button>
+        </Form>
+
+        <div className="output">
+          <h4>Names: </h4>
+          <ul>
+            { this.state.names.map((name, i) => <li key={i}>{name}</li>)}
+          </ul>
+        </div>
+      </div>
     );
   }
 }
