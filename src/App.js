@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import isEmail from 'validator/lib/isEmail';
 
 import { Form, FormGroup, ControlLabel, FormControl, Button, Col } from 'react-bootstrap';
 
@@ -10,6 +11,7 @@ class App extends Component {
       name: '',
       email: ''
     },
+    errors: {},
     members: [],
   };
 
@@ -18,28 +20,47 @@ class App extends Component {
   }
 
   onFormSubmit = (evt) => {
-    const members = [
-      ...this.state.members, 
-      this.state.fields,
-    ];
+    const members = [...this.state.members];
+    const member = this.state.fields;
+    const errors = this.validate(member);
+    this.setState({ errors });
+    evt.preventDefault();
+
+    if (Object.keys(errors).length) return;
 
     this.setState({ 
-      members,
+      members: members.concat(member),
       fields: {
         name: '',
         email: ''
       }
     });
-
-    evt.preventDefault();
+ 
     this.nameInput.focus();
-  }
+  };
   
   onInputChange = (evt) => {
     const fields = this.state.fields;
     fields[evt.target.name] = evt.target.value;
     this.setState({fields});
-  }
+  };
+
+  validate = (member) => {
+    const errors = {};
+    if (!member.name) errors.name = 'Name Required';
+    if (!member.email) errors.email = 'Email Required';
+    if (member.email && !isEmail(member.email)) errors.email = 'Invalid Email';
+    return errors;
+  };
+
+  getNameValidation = () => {
+    const trimmed = this.state.fields.name.trim();
+    const length = trimmed.length;
+    if (length > 3) return 'success';
+    else if (length > 2) return 'warning';
+    else if (length > 0) return 'error';
+  };
+
   render() {
     const wellStyles = {maxWidth: 600, margin: '20px auto 10px'};
 
@@ -47,9 +68,12 @@ class App extends Component {
       <div style={wellStyles}>
         <div className="well" style={wellStyles}>
           <Form horizontal onSubmit={this.onFormSubmit}>
-            <h3 className="header">Sign Up</h3>
+            <h3 style={{textAlign: 'center'}}>Sign Up</h3>
 
-            <FormGroup controlId="formInlineName">
+            <FormGroup 
+              controlId="formInlineName"
+              validationState={this.getNameValidation()}
+            >
               <Col componentClass={ControlLabel} sm={2}>
                 Name
               </Col>
@@ -62,8 +86,13 @@ class App extends Component {
                   onChange={this.onInputChange}
                   inputRef={(input) => { this.nameInput = input; }}
                 />
+                <FormControl.Feedback />
+              </Col>
+              <Col smOffset={2} sm={10}>
+                <span style={{ color: 'red'}}>{this.state.errors.name}</span>
               </Col>
             </FormGroup>
+            
             <FormGroup controlId="formInlineEmail">
               <Col componentClass={ControlLabel} sm={2}>
                 Email
@@ -77,7 +106,11 @@ class App extends Component {
                   onChange={this.onInputChange}
                 />
               </Col>
+              <Col smOffset={2} sm={10}>
+                <span style={{ color: 'red'}}>{this.state.errors.email}</span>
+              </Col>
             </FormGroup>
+
             <FormGroup>
               <Col smOffset={2} sm={10}>
                 <Button type="submit">
@@ -87,7 +120,8 @@ class App extends Component {
              </FormGroup>
           </Form>
         </div>
-        <div className="output">
+
+        <div style={{marginTop: '30px'}}>
             <h4>Members: </h4>
             <ul>
               { this.state.members.map(({name, email}, i) => 
