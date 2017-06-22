@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import isEmail from 'validator/lib/isEmail';
-
 import { Form, FormGroup, ControlLabel, FormControl, Button, Col } from 'react-bootstrap';
-
 import './App.css';
+
+import Field from './input-component.js';
 
 class App extends Component {
   state = { 
@@ -15,18 +15,13 @@ class App extends Component {
     members: [],
   };
 
-  componentDidMount() {
-    this.nameInput.focus();
-  }
-
   onFormSubmit = (evt) => {
-    const members = [...this.state.members];
+    const members = this.state.members;
     const member = this.state.fields;
-    const errors = this.validate(member);
-    this.setState({ errors });
+    
     evt.preventDefault();
 
-    if (Object.keys(errors).length) return;
+    if (this.validate()) return;
 
     this.setState({ 
       members: members.concat(member),
@@ -35,30 +30,28 @@ class App extends Component {
         email: ''
       }
     });
- 
-    this.nameInput.focus();
   };
   
-  onInputChange = (evt) => {
+  onInputChange = ({name, value, error}) => {
     const fields = this.state.fields;
-    fields[evt.target.name] = evt.target.value;
-    this.setState({fields});
+    const errors = this.state.errors;
+
+    fields[name] = value;
+    errors[name] = error;
+
+    this.setState({ fields, errors });
   };
 
-  validate = (member) => {
-    const errors = {};
-    if (!member.name) errors.name = 'Name Required';
-    if (!member.email) errors.email = 'Email Required';
-    if (member.email && !isEmail(member.email)) errors.email = 'Invalid Email';
-    return errors;
-  };
+  validate = () => {
+    const member = this.state.fields;
+    const errors = this.state.errors;
+    const messages = Object.keys(errors).filter((k) => errors[k]);
 
-  getNameValidation = () => {
-    const trimmed = this.state.fields.name.trim();
-    const length = trimmed.length;
-    if (length > 3) return 'success';
-    else if (length > 2) return 'warning';
-    else if (length > 0) return 'error';
+    if (!member.name) return true;
+    if (!member.email) return true;
+    if (messages.length) return true;
+
+    return false;
   };
 
   render() {
@@ -70,50 +63,32 @@ class App extends Component {
           <Form horizontal onSubmit={this.onFormSubmit}>
             <h3 style={{textAlign: 'center'}}>Sign Up</h3>
 
-            <FormGroup 
-              controlId="formInlineName"
-              validationState={this.getNameValidation()}
-            >
-              <Col componentClass={ControlLabel} sm={2}>
-                Name
-              </Col>
-              <Col sm={10}>
-                <FormControl
-                  type="text"
-                  name="name"
-                  placeholder="Name"
-                  value={this.state.fields.name}
-                  onChange={this.onInputChange}
-                  inputRef={(input) => { this.nameInput = input; }}
-                />
-                <FormControl.Feedback />
-              </Col>
-              <Col smOffset={2} sm={10}>
-                <span style={{ color: 'red'}}>{this.state.errors.name}</span>
-              </Col>
-            </FormGroup>
-            
-            <FormGroup controlId="formInlineEmail">
-              <Col componentClass={ControlLabel} sm={2}>
-                Email
-              </Col>
-              <Col sm={10}>
-                <FormControl
-                  type="email"
-                  name="email"
-                  placeholder="user@email.com"
-                  value={this.state.fields.email}
-                  onChange={this.onInputChange}
-                />
-              </Col>
-              <Col smOffset={2} sm={10}>
-                <span style={{ color: 'red'}}>{this.state.errors.email}</span>
-              </Col>
-            </FormGroup>
+            <Field
+              placeholder='Name'
+              name='name'
+              type='text'
+              label='Name'
+              value={this.state.fields.name}
+              onChange={this.onInputChange}
+              validate={(val) => (val ? false : 'Name Required')}
+            />
 
+            <Field
+              placeholder='user@email.com'
+              name='email'
+              type='email'
+              label='Email'
+              value={this.state.fields.email}
+              onChange={this.onInputChange}
+              validate={(val) => (isEmail(val) ? false : 'Invalid Email')}
+            />
+            
             <FormGroup>
               <Col smOffset={2} sm={10}>
-                <Button type="submit">
+                <Button 
+                  type="submit"
+                  disabled={this.validate()}
+                >
                 Submit
                 </Button>
               </Col>
