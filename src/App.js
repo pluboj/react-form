@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import isEmail from 'validator/lib/isEmail';
-import { Form, FormGroup, ControlLabel, FormControl, Button, Col } from 'react-bootstrap';
+import { Form, FormGroup, Button, Col } from 'react-bootstrap';
 import './App.css';
 
 import Field from './input-component.js';
@@ -80,7 +80,9 @@ class App extends Component {
               label='Email'
               value={this.state.fields.email}
               onChange={this.onInputChange}
-              validate={(val) => (isEmail(val) ? false : 'Invalid Email')}
+              validate={(val) => (
+                val.length < 5 || (val.length >= 5 && isEmail(val)) ? false : 'Invalid Email'
+              )}
             />
             
             <FormGroup>
