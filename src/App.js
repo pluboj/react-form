@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import isEmail from 'validator/lib/isEmail';
-import { Form, FormGroup, Button, Col } from 'react-bootstrap';
+import { Form, FormGroup, Button, Col, Checkbox } from 'react-bootstrap';
 import './App.css';
 
 import Field from './input-component.js';
@@ -9,7 +9,8 @@ class App extends Component {
   state = { 
     fields: {
       name: '',
-      email: ''
+      email: '',
+      check: false
     },
     errors: {},
     members: [],
@@ -27,7 +28,8 @@ class App extends Component {
       members: members.concat(member),
       fields: {
         name: '',
-        email: ''
+        email: '',
+        check: false
       }
     });
   };
@@ -41,6 +43,12 @@ class App extends Component {
 
     this.setState({ fields, errors });
   };
+
+  checkChange = (e) => {
+    const fields = this.state.fields;
+    fields.check = e.target.checked;
+    this.setState(fields);
+  }
 
   validate = () => {
     const member = this.state.fields;
@@ -84,6 +92,19 @@ class App extends Component {
                 val.length < 5 || (val.length >= 5 && isEmail(val)) ? false : 'Invalid Email'
               )}
             />
+
+            <FormGroup>
+              <Col smOffset={2} sm={10}>
+                <Checkbox 
+                  inputRef={ref => { this.check = ref; }}
+                  onChange={this.checkChange}
+                  checked={this.state.fields.check}
+                  name='check'
+                  >
+                  Save my email
+                </Checkbox>
+              </Col>
+            </FormGroup>
             
             <FormGroup>
               <Col smOffset={2} sm={10}>
@@ -101,8 +122,8 @@ class App extends Component {
         <div style={{marginTop: '30px'}}>
             <h4>Members: </h4>
             <ul>
-              { this.state.members.map(({name, email}, i) => 
-                <li key={i}>{name} ({email})</li>)}
+              { this.state.members.map(({name, email, check}, i) => 
+                <li key={i}>{name} ({email}) <i>save email:{check ? 'yes': 'no'}</i></li>)}
             </ul>
           </div>
       </div>
