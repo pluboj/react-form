@@ -101,7 +101,7 @@ class App extends Component {
                   checked={this.state.fields.check}
                   name='check'
                   >
-                  Save my email
+                  Subscribe
                 </Checkbox>
               </Col>
             </FormGroup>
@@ -123,7 +123,7 @@ class App extends Component {
             <h4>Members: </h4>
             <ul>
               { this.state.members.map(({name, email, check}, i) => 
-                <li key={i}>{name} ({email}) <i>save email:{check ? 'yes': 'no'}</i></li>)}
+                <li key={i}>{name} ({email}) <i>subscribe:{check ? 'yes': 'no'}</i></li>)}
             </ul>
           </div>
       </div>
